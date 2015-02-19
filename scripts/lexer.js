@@ -36,7 +36,7 @@ function processLine(line){
 			//Else, do nothing, just skip the space
 			charLeft--;
 			
-		//Test for character a-z
+		//Test for character a-z-----------------------------------------------
 		}else if(line[j].match(/[a-z]/)){
 			var aKeyword = false; //Initialize this every loop
 			//If its in a string, then its a char
@@ -45,12 +45,12 @@ function processLine(line){
 				
 			//If not in a string, it could be an identifier
 			//If it appears at the end of a line, then it must be an identifier
-			} else if(charLeft == 1){
+			} else if(charLeft == 2){
 					processToken(lineNum, "T_ID", line[j]);
 			
-			} else if(charLeft > 1){
+			} else if(charLeft > 2){
 				//Check if next char is a space or operator
-				if(line[j+1].match(/\s|\+|\=|\!/)){
+				if(line[j+1].match(/\s|\+|\=|\!|\)/)){
 					processToken(lineNum, "T_ID", line[j]);
 				} else {
 					aKeyword = true;
@@ -59,7 +59,6 @@ function processLine(line){
 			}
 			if(aKeyword){
 				var tempStr = "";
-				putMessage("About to switch " + line[j]);
 				switch(line[j]){
 					case "i": 
 							if(line[j+1] == "f"){
@@ -71,7 +70,7 @@ function processLine(line){
 									if(line[j+2] == "t"){
 										processToken(lineNum, "T_INT", "int");
 										j += 2; //Account for the extra char reads
-										charLeft -= 2;
+										charLeft -= 1;
 									}
 								}
 							}else {
@@ -196,12 +195,92 @@ function processLine(line){
 			}
 			charLeft--;
 			
+		//Test for digits
+		}else if(line[j].match(/[0-9]/)){
+			if(isString){
+				processToken(lineNum, "T_CHAR", line[j]);
+			}else{
+			processToken(lineNum, "T_DIGIT", line[j]);
+			}
+			charLeft--;
 		
 		}else{
-		 tokens[tokenIndex] = "No Match.";
-		 tokenIndex++;
-		 charLeft--;
+			if(isString && line[j] != "\""){
+				processToken(lineNum, "T_CHAR", line[j]);
+				charLeft--;
+			}else{
+				switch(line[j]){
+			
+				case "\"":
+						isString = !isString;
+						processToken(lineNum, "T_DBLQUOTE", line[j]);
+						charLeft--;
+				break;
+				
+				case "+":
+						processToken(lineNum, "T_INTOP", line[j]);
+						charLeft--;
+				break;
+				
+				case "$":
+						processToken(lineNum, "T_EOF", line[j]);
+						charLeft--;
+				break;
+				
+				case "(":
+						processToken(lineNum, "T_LEFTPAREN", line[j]);
+						charLeft--;
+				break;
+				
+				case ")":
+						processToken(lineNum, "T_RIGHTPAREN", line[j]);
+						charLeft--;
+				break;
+				
+				case "{":
+						processToken(lineNum, "T_LEFTBRACE", line[j]);
+						charLeft--;
+				break;
+				
+				case "}":
+						processToken(lineNum, "T_RIGHTBRACE", line[j]);
+						charLeft--;
+				break;
+				
+				case "=":
+						if(charLeft > 1){
+							if(line[j+1] == "="){
+								processToken(lineNum, "T_BOOLOP", "==");
+								j++;
+								charLeft -= 2;
+								break;
+								}
+						}
+							processToken(lineNum, "T_ASSIGNOP", line[j]);
+						charLeft--;
+				break;
+				
+				case "!":
+						if(charLeft > 1){
+							if(line[j+1] == "=")
+								processToken(lineNum, "T_BOOLOP", "!=");
+								j++;
+								charLeft--;
+						}else{
+							tokens[tokenIndex] = "No Match for " + line[j];
+							tokenIndex++;
+						}
+						charLeft--;
+				break;
+				
+				default:
+					tokens[tokenIndex] = "No Match for " + line[j];
+					tokenIndex++;
+					charLeft--;
+				}
+			}
 		}
+		//putMessage("charLeft = " + charLeft);
 	}
 	
 }
@@ -212,9 +291,11 @@ function splitByLine(src){
 	return src;
 }
 
+//Creates a token, places it into the token array, then points to next spot in token array
 function processToken(ln, t, v){
 	tokens[tokenIndex] = new tokenObj(ln, t, v);
 	tokenIndex++;
+	//putMessage("Processed: " + v + " on line " + ln);
 }
 
 //OBJECT CONSTRUCTORS-----------------------------------------------------------------
