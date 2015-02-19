@@ -45,10 +45,10 @@ function processLine(line){
 				
 			//If not in a string, it could be an identifier
 			//If it appears at the end of a line, then it must be an identifier
-			} else if(charLeft == 2){
+			} else if(charLeft == 1){
 					processToken(lineNum, "T_ID", line[j]);
 			
-			} else if(charLeft > 2){
+			} else if(charLeft > 1){
 				//Check if next char is a space or operator
 				if(line[j+1].match(/\s|\+|\=|\!|\)/)){
 					processToken(lineNum, "T_ID", line[j]);
@@ -70,7 +70,7 @@ function processLine(line){
 									if(line[j+2] == "t"){
 										processToken(lineNum, "T_INT", "int");
 										j += 2; //Account for the extra char reads
-										charLeft -= 1;
+										charLeft -= 2;
 									}
 								}
 							}else {
