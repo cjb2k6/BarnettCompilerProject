@@ -25,35 +25,182 @@ function lex(){
 //Processes each line of the source code into tokens
 function processLine(line){
 	var isString = false;
+	var charLeft = line.length;
 	
 	for(var j = 0; j < line.length; j++){
 		//Test for space
-		if(line[j].match(/\s/)){
-			//Is the space in a string?
+		if(line[j].match(/\s/)){ //Is the space in a string?
 			if(isString){
-				//Create the space token, add to tokens
-				tokens[tokenIndex] = new tokenObj(lineNum, "T_SPACE", " ");
-				tokenIndex++;
+				processToken(lineNum, "T_SPACE", " "); //Create the space token, add to tokens
 			}
 			//Else, do nothing, just skip the space
+			charLeft--;
 			
 		//Test for character a-z
 		}else if(line[j].match(/[a-z]/)){
+			var aKeyword = false; //Initialize this every loop
 			//If its in a string, then its a char
 			if(isString){
-				tokens[tokenIndex] = new tokenObj(lineNum, "T_CHAR", line[j]);
-				tokenIndex++;
+				processToken(lineNum, "T_CHAR", line[j]);
 				
-			//If not in a string, it could be an identifier or part of a keyword
-			} else {
-				tokens[tokenIndex] = new tokenObj(lineNum, "T_ID", line[j]);
-				tokenIndex++;
+			//If not in a string, it could be an identifier
+			//If it appears at the end of a line, then it must be an identifier
+			} else if(charLeft == 1){
+					processToken(lineNum, "T_ID", line[j]);
+			
+			} else if(charLeft > 1){
+				//Check if next char is a space or operator
+				if(line[j+1].match(/\s|\+|\=|\!/)){
+					processToken(lineNum, "T_ID", line[j]);
+				} else {
+					aKeyword = true;
+				}
+			//If not an identifier, could be a keyword
 			}
+			if(aKeyword){
+				var tempStr = "";
+				putMessage("About to switch " + line[j]);
+				switch(line[j]){
+					case "i": 
+							if(line[j+1] == "f"){
+								processToken(lineNum, "T_IF", "if");
+								j++; //Account for the extra char read
+								charLeft--;
+							}else if(line[j+1] == "n"){
+								if(charLeft > 2){
+									if(line[j+2] == "t"){
+										processToken(lineNum, "T_INT", "int");
+										j += 2; //Account for the extra char reads
+										charLeft -= 2;
+									}
+								}
+							}else {
+							 putMessage("Token \"i\" on line " + lineNum + " should not have a letter following it.");
+							 errorCount++;
+							}
+					break;
+					
+					case "t":
+							if(charLeft > 3){
+								for(var k = 0; k < 4; k++){
+									tempStr += line[j+k]
+								}
+								if(tempStr == "true"){
+									processToken(lineNum, "T_BOOLVAL", "true");
+									j += 3; //Account for the extra char reads
+									charLeft -= 3;
+								} else{
+									putMessage(tempStr + " != to true");
+								}
+							}else {
+							 putMessage("Token \"t\" on line " + lineNum + " should not have a letter following it.");
+							 errorCount++;
+							}
+					break;
+					
+					case "f":
+							if(charLeft > 4){
+								for(var k = 0; k < 5; k++){
+									tempStr += line[j+k]
+								}
+								if(tempStr == "false"){
+									processToken(lineNum, "T_BOOLVAL", "false");
+									j += 4; //Account for the extra char reads
+									charLeft -= 4;
+								} else{
+									putMessage(tempStr + " != to true");
+								}
+							}else {
+							 putMessage("Token \"f\" on line " + lineNum + " should not have a letter following it.");
+							 errorCount++;
+							}
+					break;
+					
+					case "s":
+							if(charLeft > 5){
+								for(var k = 0; k < 6; k++){
+									tempStr += line[j+k]
+								}
+								if(tempStr == "string"){
+									processToken(lineNum, "T_STRING", "string");
+									j += 5; //Account for the extra char reads
+									charLeft -= 5;
+								} else{
+									putMessage(tempStr + " != to true");
+								}
+							}else {
+							 putMessage("Token \"s\" on line " + lineNum + " should not have a letter following it.");
+							 errorCount++;
+							}
+					break;
+					
+					case "b":
+							if(charLeft > 6){
+								for(var k = 0; k < 7; k++){
+									tempStr += line[j+k]
+								}
+								if(tempStr == "boolean"){
+									processToken(lineNum, "T_BOOLEAN", "boolean");
+									j += 6; //Account for the extra char reads
+									charLeft -= 6;
+								} else{
+									putMessage(tempStr + " != to true");
+								}
+							}else {
+							 putMessage("Token \"b\" on line " + lineNum + " should not have a letter following it.");
+							 errorCount++;
+							}
+					break;
+					
+					case "p":
+							if(charLeft > 4){
+								for(var k = 0; k < 5; k++){
+									tempStr += line[j+k]
+								}
+								if(tempStr == "print"){
+									processToken(lineNum, "T_PRINT", "print");
+									j += 4; //Account for the extra char reads
+									charLeft -= 4;
+								} else{
+									putMessage(tempStr + " != to true");
+								}
+							}else {
+							 putMessage("Token \"p\" on line " + lineNum + " should not have a letter following it.");
+							 errorCount++;
+							}
+					break;
+					
+					case "w":
+							if(charLeft > 4){
+								for(var k = 0; k < 5; k++){
+									tempStr += line[j+k]
+								}
+								if(tempStr == "while"){
+									processToken(lineNum, "T_WHILE", "while");
+									j += 4; //Account for the extra char reads
+									charLeft -= 4;
+								} else{
+									putMessage(tempStr + " != to true");
+								}
+							}else {
+							 putMessage("Token \"w\" on line " + lineNum + " should not have a letter following it.");
+							 errorCount++;
+							}
+					break;
+					
+					default:
+					//error message
+					putMessage("Could not do a thing with " + line[j]);
+					
+				}
+			}
+			charLeft--;
 			
 		
 		}else{
 		 tokens[tokenIndex] = "No Match.";
 		 tokenIndex++;
+		 charLeft--;
 		}
 	}
 	
@@ -63,6 +210,11 @@ function processLine(line){
 function splitByLine(src){
 	src = src.split("\n");
 	return src;
+}
+
+function processToken(ln, t, v){
+	tokens[tokenIndex] = new tokenObj(ln, t, v);
+	tokenIndex++;
 }
 
 //OBJECT CONSTRUCTORS-----------------------------------------------------------------
