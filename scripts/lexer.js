@@ -1,5 +1,7 @@
 //Global Variables
 var lineNum = 1; //Keep track of the line number
+var stringLine = 0;//Keep track of what line a string literal should be defined on
+var isString = false;
 
 //FUNCTIONS---------------------------------------------------------------------------
 //This is the main function of the lexer.
@@ -24,7 +26,6 @@ function lex(){
 }
 //Processes each line of the source code into tokens
 function processLine(line){
-	var isString = false;
 	var charLeft = line.length;
 	
 	for(var j = 0; j < line.length; j++){
@@ -41,16 +42,21 @@ function processLine(line){
 			var aKeyword = false; //Initialize this every loop
 			//If its in a string, then its a char
 			if(isString){
-				processToken(lineNum, "T_CHAR", line[j]);
-				
+				//Is the string still on the line it started on?
+				if(stringLine == lineNum){
+					processToken(lineNum, "T_CHAR", line[j]);
+				} else {
+					putMessage("Error: No ending \" found on line " + stringLine + ".");
+					isString = false;
+				}
 			//If not in a string, it could be an identifier
 			//If it appears at the end of a line, then it must be an identifier
 			} else if(charLeft == 1){
 					processToken(lineNum, "T_ID", line[j]);
 			
 			} else if(charLeft > 1){
-				//Check if next char is a space or operator
-				if(line[j+1].match(/\s|\+|\=|\!|\)/)){
+				//Check if next char is a space or valid symbol
+				if(line[j+1].match(/\s|\+|\=|\!|\|\)|\"|\)|\(/)){
 					processToken(lineNum, "T_ID", line[j]);
 				} else {
 					aKeyword = true;
@@ -60,6 +66,7 @@ function processLine(line){
 			if(aKeyword){
 				var tempStr = "";
 				switch(line[j]){
+					//If its an I, it could be "if" or "int"
 					case "i": 
 							if(line[j+1] == "f"){
 								processToken(lineNum, "T_IF", "if");
@@ -79,6 +86,7 @@ function processLine(line){
 							}
 					break;
 					
+					//If its a t, it could be "true"
 					case "t":
 							if(charLeft > 3){
 								for(var k = 0; k < 4; k++){
@@ -97,6 +105,7 @@ function processLine(line){
 							}
 					break;
 					
+					//If its an f, it could be "false"
 					case "f":
 							if(charLeft > 4){
 								for(var k = 0; k < 5; k++){
@@ -115,6 +124,7 @@ function processLine(line){
 							}
 					break;
 					
+					//If its an s, it could be "string"
 					case "s":
 							if(charLeft > 5){
 								for(var k = 0; k < 6; k++){
@@ -133,6 +143,7 @@ function processLine(line){
 							}
 					break;
 					
+					//If its a b, it could be "boolean"
 					case "b":
 							if(charLeft > 6){
 								for(var k = 0; k < 7; k++){
@@ -151,6 +162,7 @@ function processLine(line){
 							}
 					break;
 					
+					//If its a p, it might be "print"
 					case "p":
 							if(charLeft > 4){
 								for(var k = 0; k < 5; k++){
@@ -169,6 +181,7 @@ function processLine(line){
 							}
 					break;
 					
+					//If its a w, it could be "while"
 					case "w":
 							if(charLeft > 4){
 								for(var k = 0; k < 5; k++){
@@ -188,8 +201,16 @@ function processLine(line){
 					break;
 					
 					default:
-					//error message
-					putMessage("Could not do a thing with " + line[j]);
+						//error message
+						putMessage("Error on line " + lineNum +": Identifiers must be a single alphabetic character.");
+						errorCount++;
+					
+						//Skip the illegal sequence of characters
+						while(!line[j].match(/\s/) && charLeft > 0){
+							putMessage("Skipping char: " + line[j] + " on line " + lineNum);
+							j++;
+							charLeft--;
+						}
 					
 				}
 			}
@@ -205,14 +226,22 @@ function processLine(line){
 			charLeft--;
 		
 		}else{
+		
+			//Test for symbols
+			//If it is currently processing a string, read it as a char
 			if(isString && line[j] != "\""){
-				processToken(lineNum, "T_CHAR", line[j]);
-				charLeft--;
+				if(line[j].match(/[a-z]|\s/)){
+					processToken(lineNum, "T_CHAR", line[j]);
+					charLeft--;
+					}else{
+					 putMessage("Error on line " + lineNum + ". " + line[j] + " is not valid in a string.");
+					}
 			}else{
 				switch(line[j]){
 			
 				case "\"":
 						isString = !isString;
+						stringLine = lineNum;
 						processToken(lineNum, "T_DBLQUOTE", line[j]);
 						charLeft--;
 				break;
@@ -249,6 +278,7 @@ function processLine(line){
 				
 				case "=":
 						if(charLeft > 1){
+							//Is next char "="?
 							if(line[j+1] == "="){
 								processToken(lineNum, "T_BOOLOP", "==");
 								j++;
@@ -262,6 +292,7 @@ function processLine(line){
 				
 				case "!":
 						if(charLeft > 1){
+						//Is next char "!"?
 							if(line[j+1] == "=")
 								processToken(lineNum, "T_BOOLOP", "!=");
 								j++;
@@ -301,9 +332,11 @@ function processToken(ln, t, v){
 //OBJECT CONSTRUCTORS-----------------------------------------------------------------
 /* --------  
    Token Object Constructor
-   Params: lineNum:int  - the line number the token is on, 1 is the first line number
-		   type:String  - the type of token it is
-		   value:String - the actual token itself
+   Params: 	lineNum:int  - the line number the token is on, 1 is the first line number
+			type:String  - the type of token it is
+			value:String - the actual token itself
+			
+   Methods: toString() - overrides default toString, prints the three values in one line.
    -------- */
 function tokenObj(lineNumber, type, value){
 	this.lineNumber = lineNumber;
