@@ -75,7 +75,7 @@ function processLine(line){
 							}else if(line[j+1] == "n"){
 								if(charLeft > 2){
 									if(line[j+2] == "t"){
-										processToken(lineNum, "T_INT", "int");
+										processToken(lineNum, "T_TYPE", "int");
 										j += 2; //Account for the extra char reads
 										charLeft -= 2;
 									}
@@ -131,7 +131,7 @@ function processLine(line){
 									tempStr += line[j+k]
 								}
 								if(tempStr == "string"){
-									processToken(lineNum, "T_STRING", "string");
+									processToken(lineNum, "T_TYPE", "string");
 									j += 5; //Account for the extra char reads
 									charLeft -= 5;
 								} else{
@@ -150,7 +150,7 @@ function processLine(line){
 									tempStr += line[j+k]
 								}
 								if(tempStr == "boolean"){
-									processToken(lineNum, "T_BOOLEAN", "boolean");
+									processToken(lineNum, "T_TYPE", "boolean");
 									j += 6; //Account for the extra char reads
 									charLeft -= 6;
 								} else{

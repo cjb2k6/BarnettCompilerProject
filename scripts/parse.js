@@ -18,7 +18,60 @@ function parseBlock(){
 }
 
 function parseStatementList(){
-	putMessage("Stuff to parse statement list.")
+	var t = currentToken.type;
+	if(t == "T_PRINT" || t == "T_ID" || t == "T_TYPE" ||  t == "T_WHILE" || t == "T_IF"){
+		parseStatement();
+		parseStatementList();
+	} else {
+		//Epsilon Thingy
+	}
+}
+
+function parseStatement(){
+	switch(currentToken.type){
+		case "T_PRINT":
+			parsePrintStatement();
+		break;
+		
+		case "T_ID":
+			parseAssignmentStatement();
+		break;
+		
+		case "T_TYPE":
+			parseVarDecl();
+		break;
+		
+		case "T_WHILE":
+			parseWhileStatement();
+		break;
+		
+		case "T_IF":
+			parseIfStatement();
+		break;
+		
+		default:
+			putMessage("Could not parseStatement " + currentToken.type);
+	}
+}
+
+function parsePrintStatement(){
+	matchToken("T_PRINT");
+}
+
+function parseAssignmentStatement(){
+	matchToken("T_ID");
+}
+
+function parseVarDecl(){
+	matchToken("T_TYPE");
+}
+
+function parseWhileStatement(){
+	matchToken("T_WHILE");
+}
+
+function parseIfStatement(){
+	matchToken("T_IF");
 }
 
 //Function from Alan's Example
@@ -60,6 +113,56 @@ function matchToken(expectedType){
 					putMessage("Expecting a Right Brace");
 					if(currentToken.type == "T_RIGHTBRACE"){
 						putMessage("Got a Right Brace!");
+					} else {
+						putMessage("Error: Got " + currentToken.type + " instead.");
+						errorCount++;
+					}
+		break;
+		
+		case "T_PRINT":
+					putMessage("Expecting Print Keyword");
+					if(currentToken.type == "T_PRINT"){
+						putMessage("Got a Print Keyword!");
+					} else {
+						putMessage("Error: Got " + currentToken.type + " instead.");
+						errorCount++;
+					}
+		break;
+		
+		case "T_ID":
+					putMessage("Expecting Identifier");
+					if(currentToken.type == "T_ID"){
+						putMessage("Got an Identifier!");
+					} else {
+						putMessage("Error: Got " + currentToken.type + " instead.");
+						errorCount++;
+					}
+		break;
+		
+		case "T_TYPE":
+					putMessage("Expecting a Type Keyword");
+					if(currentToken.type == "T_TYPE"){
+						putMessage("Got a Type Keyword!");
+					} else {
+						putMessage("Error: Got " + currentToken.type + " instead.");
+						errorCount++;
+					}
+		break;
+		
+		case "T_WHILE":
+					putMessage("Expecting While Keyword");
+					if(currentToken.type == "T_WHILE"){
+						putMessage("Got the While Keyword!");
+					} else {
+						putMessage("Error: Got " + currentToken.type + " instead.");
+						errorCount++;
+					}
+		break;
+		
+		case "T_IF":
+					putMessage("Expecting If Keyword");
+					if(currentToken.type == "T_IF"){
+						putMessage("Got the If Keyword!");
 					} else {
 						putMessage("Error: Got " + currentToken.type + " instead.");
 						errorCount++;
