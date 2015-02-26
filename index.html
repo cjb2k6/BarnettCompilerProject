@@ -54,9 +54,10 @@
         // Note the <input> element's event handler: onclick="btnCompile_click();
         init();
         putMessage("Lexing Started");
-        // Grab the tokens from the lexer . . .
-        //tokens = lex();
+
 		lex();
+		
+		putMessage("Lexing Finished");
 		tokenIndex = 0;
 		//Test code to display lexer output
 		//for(var i = 0; i < tokens.length; i++){

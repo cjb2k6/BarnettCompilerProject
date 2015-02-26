@@ -235,6 +235,7 @@ function processLine(line){
 					charLeft--;
 					}else{
 					 putMessage("Error on line " + lineNum + ". " + line[j] + " is not valid in a string.");
+					 errorCount++;
 					}
 			}else{
 				switch(line[j]){
