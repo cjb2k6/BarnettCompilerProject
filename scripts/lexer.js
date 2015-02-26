@@ -47,23 +47,12 @@ function processLine(line){
 					processToken(lineNum, "T_CHAR", line[j]);
 				} else {
 					putMessage("Error: No ending \" found on line " + stringLine + ".");
+					errorCount++;
 					isString = false;
 				}
 			//If not in a string, it could be an identifier
 			//If it appears at the end of a line, then it must be an identifier
-			} else if(charLeft == 1){
-					processToken(lineNum, "T_ID", line[j]);
-			
-			} else if(charLeft > 1){
-				//Check if next char is a space or valid symbol
-				if(line[j+1].match(/\s|\+|\=|\!|\|\)|\"|\)|\(/)){
-					processToken(lineNum, "T_ID", line[j]);
-				} else {
-					aKeyword = true;
-				}
-			//If not an identifier, could be a keyword
-			}
-			if(aKeyword){
+			}else{
 				var tempStr = "";
 				switch(line[j]){
 					//If its an I, it could be "if" or "int"
@@ -81,8 +70,8 @@ function processLine(line){
 									}
 								}
 							}else {
-							 putMessage("Token \"i\" on line " + lineNum + " should not have a letter following it.");
-							 errorCount++;
+								//It must be an identifier
+								processToken(lineNum, "T_ID", line[j]);
 							}
 					break;
 					
@@ -97,14 +86,15 @@ function processLine(line){
 									j += 3; //Account for the extra char reads
 									charLeft -= 3;
 								} else{
-									putMessage(tempStr + " != to true");
+									//It must be an identifier
+									processToken(lineNum, "T_ID", line[j]);
 								}
 							}else {
-							 putMessage("Token \"t\" on line " + lineNum + " should not have a letter following it.");
-							 errorCount++;
+								//It must be an identifier
+								processToken(lineNum, "T_ID", line[j]);
 							}
 					break;
-					
+				
 					//If its an f, it could be "false"
 					case "f":
 							if(charLeft > 4){
@@ -116,14 +106,15 @@ function processLine(line){
 									j += 4; //Account for the extra char reads
 									charLeft -= 4;
 								} else{
-									putMessage(tempStr + " != to true");
+									//It must be an identifier
+									processToken(lineNum, "T_ID", line[j]);
 								}
 							}else {
-							 putMessage("Token \"f\" on line " + lineNum + " should not have a letter following it.");
-							 errorCount++;
+								//It must be an identifier
+								processToken(lineNum, "T_ID", line[j]);
 							}
 					break;
-					
+				
 					//If its an s, it could be "string"
 					case "s":
 							if(charLeft > 5){
@@ -135,11 +126,12 @@ function processLine(line){
 									j += 5; //Account for the extra char reads
 									charLeft -= 5;
 								} else{
-									putMessage(tempStr + " != to true");
+									//It must be an identifier
+									processToken(lineNum, "T_ID", line[j]);
 								}
 							}else {
-							 putMessage("Token \"s\" on line " + lineNum + " should not have a letter following it.");
-							 errorCount++;
+								//It must be an identifier
+								processToken(lineNum, "T_ID", line[j]);
 							}
 					break;
 					
@@ -154,14 +146,15 @@ function processLine(line){
 									j += 6; //Account for the extra char reads
 									charLeft -= 6;
 								} else{
-									putMessage(tempStr + " != to true");
+									//It must be an identifier
+									processToken(lineNum, "T_ID", line[j]);
 								}
 							}else {
-							 putMessage("Token \"b\" on line " + lineNum + " should not have a letter following it.");
-							 errorCount++;
+								//It must be an identifier
+								processToken(lineNum, "T_ID", line[j]);
 							}
 					break;
-					
+						
 					//If its a p, it might be "print"
 					case "p":
 							if(charLeft > 4){
@@ -173,11 +166,12 @@ function processLine(line){
 									j += 4; //Account for the extra char reads
 									charLeft -= 4;
 								} else{
-									putMessage(tempStr + " != to true");
+									//It must be an identifier
+									processToken(lineNum, "T_ID", line[j]);
 								}
 							}else {
-							 putMessage("Token \"p\" on line " + lineNum + " should not have a letter following it.");
-							 errorCount++;
+								//It must be an identifier
+								processToken(lineNum, "T_ID", line[j]);
 							}
 					break;
 					
@@ -192,36 +186,28 @@ function processLine(line){
 									j += 4; //Account for the extra char reads
 									charLeft -= 4;
 								} else{
-									putMessage(tempStr + " != to true");
+									//It must be an identifier
+									processToken(lineNum, "T_ID", line[j]);
 								}
 							}else {
-							 putMessage("Token \"w\" on line " + lineNum + " should not have a letter following it.");
-							 errorCount++;
+								//It must be an identifier
+								processToken(lineNum, "T_ID", line[j]);
 							}
 					break;
 					
 					default:
-						//error message
-						putMessage("Error on line " + lineNum +": Identifiers must be a single alphabetic character.");
-						errorCount++;
-					
-						//Skip the illegal sequence of characters
-						while(!line[j].match(/\s/) && charLeft > 0){
-							putMessage("Skipping char: " + line[j] + " on line " + lineNum);
-							j++;
-							charLeft--;
-						}
-					
+						//It must be an identifier
+						processToken(lineNum, "T_ID", line[j]);	
 				}
 			}
-			charLeft--;
+				charLeft--;
 			
 		//Test for digits
 		}else if(line[j].match(/[0-9]/)){
 			if(isString){
 				processToken(lineNum, "T_CHAR", line[j]);
 			}else{
-			processToken(lineNum, "T_DIGIT", line[j]);
+				processToken(lineNum, "T_DIGIT", line[j]);
 			}
 			charLeft--;
 		
@@ -234,15 +220,15 @@ function processLine(line){
 					processToken(lineNum, "T_CHAR", line[j]);
 					charLeft--;
 					}else{
-					 putMessage("Error on line " + lineNum + ". " + line[j] + " is not valid in a string.");
-					 errorCount++;
+						putMessage("Error on line " + lineNum + ". " + line[j] + " is not valid in a string.");
+						errorCount++;
 					}
 			}else{
 				switch(line[j]){
 			
 				case "\"":
-						isString = !isString;
-						stringLine = lineNum;
+						isString = !isString; //Enter or Exit string mode
+						stringLine = lineNum; //Keep track of the line the string should be on
 						processToken(lineNum, "T_DBLQUOTE", line[j]);
 						charLeft--;
 				break;

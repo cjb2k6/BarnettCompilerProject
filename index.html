@@ -58,12 +58,13 @@
 		lex();
 		
 		putMessage("Lexing Finished");
+		putMessage("Lex Output:");
 		tokenIndex = 0;
 		//Test code to display lexer output
-		//for(var i = 0; i < tokens.length; i++){
-		//	putMessage(tokens[i]);
-		//}
-		
+		for(var i = 0; i < tokens.length; i++){
+			putMessage(tokens[i]);
+		}
+		putMessage("\n");
 		if(errorCount == 0){
 			parse();
 		} else {

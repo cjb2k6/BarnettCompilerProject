@@ -1,8 +1,9 @@
+//The main parse function
 function parse(){
+	putMessage("Begin Parse");
 	currentToken = getNextToken();
-	
 	parseProgram();
-	
+	putMessage("Parsing Finished");
 	putMessage("Parsing found " + errorCount + " error(s).");
 }
 
@@ -169,12 +170,13 @@ function matchToken(expectedType){
 	switch(expectedType){
 		case "T_EOF":
 					putMessage("Expecting EOF");
-					if(currentToken.type == "T_EOF"){
-						putMessage("Got EOF!");
-					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
-						errorCount++;
-					}
+					//if(){
+						if(currentToken.type == "T_EOF"){
+							putMessage("Got EOF!");
+						} else {
+							putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+							errorCount++;
+						}
 		break;
 		
 		case "T_LEFTBRACE":
