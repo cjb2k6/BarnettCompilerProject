@@ -27,13 +27,14 @@
     // (http://developer.yahoo.com/performance/rules.html#js_bottom) -->
     <script type="text/javascript" src="scripts/utils.js"></script>	
     <script type="text/javascript" src="scripts/lexer.js"></script>		
+	<script type="text/javascript" src="scripts/parse.js"></script>	
     <script type="text/javascript">
     // Global variables
     var tokens = [];
     var tokenIndex = 0;
     var currentToken = "";
     var errorCount = 0;
-    var EOF = "$";
+    var EOF = new tokenObj(0, "T_EOF", "$");
 	
 	
 
@@ -56,9 +57,16 @@
         // Grab the tokens from the lexer . . .
         //tokens = lex();
 		lex();
+		tokenIndex = 0;
+		//Test code to display lexer output
+		//for(var i = 0; i < tokens.length; i++){
+		//	putMessage(tokens[i]);
+		//}
 		
-		for(var i = 0; i < tokens.length; i++){
-			putMessage(tokens[i]);
+		if(errorCount == 0){
+			parse();
+		} else {
+			putMessage("Lex found " + errorCount + " error(s).");
 		}
     }
     
