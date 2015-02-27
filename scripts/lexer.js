@@ -1,13 +1,15 @@
 //Global Variables
 var lineNum = 1; //Keep track of the line number
 var stringLine = 0;//Keep track of what line a string literal should be defined on
-var isString = false;
+var isString = false; //String Mode Toggle
 
-//FUNCTIONS---------------------------------------------------------------------------
+//FUNCTIONS------------------------------------------------------------------------------
 //This is the main function of the lexer.
 function lex(){
 	//Initialize
 	lineNum = 1;
+	stringLine = 0;
+	isString = false;
 	
 	// Get the source code from the text area.
     var sourceCode = document.getElementById("taSourceCode").value;
@@ -26,7 +28,7 @@ function lex(){
 }
 //Processes each line of the source code into tokens
 function processLine(line){
-	var charLeft = line.length;
+	var charLeft = line.length; //Keep track of how many characters are left on the current line
 	
 	for(var j = 0; j < line.length; j++){
 		//Test for space
@@ -37,7 +39,7 @@ function processLine(line){
 			//Else, do nothing, just skip the space
 			charLeft--;
 			
-		//Test for character a-z-----------------------------------------------
+		//Test for character a-z---------------------------------------------------------
 		}else if(line[j].match(/[a-z]/)){
 			var aKeyword = false; //Initialize this every loop
 			//If its in a string, then its a char
@@ -51,9 +53,8 @@ function processLine(line){
 					isString = false;
 				}
 			//If not in a string, it could be an identifier
-			//If it appears at the end of a line, then it must be an identifier
 			}else{
-				var tempStr = "";
+				var tempStr = ""; //Used to build strings for testing keywords
 				switch(line[j]){
 					//If its an I, it could be "if" or "int"
 					case "i": 
@@ -202,7 +203,7 @@ function processLine(line){
 			}
 				charLeft--;
 			
-		//Test for digits
+		//Test for digits----------------------------------------------------------------
 		}else if(line[j].match(/[0-9]/)){
 			if(isString){
 				processToken(lineNum, "T_CHAR", line[j]);
@@ -213,7 +214,7 @@ function processLine(line){
 		
 		}else{
 		
-			//Test for symbols
+			//Test for symbols-----------------------------------------------------------
 			//If it is currently processing a string, read it as a char
 			if(isString && line[j] != "\""){
 				if(line[j].match(/[a-z]|\s/)){
@@ -227,7 +228,7 @@ function processLine(line){
 				switch(line[j]){
 			
 				case "\"":
-						isString = !isString; //Enter or Exit string mode
+						isString = !isString; //Enter or exit String Mode
 						stringLine = lineNum; //Keep track of the line the string should be on
 						processToken(lineNum, "T_DBLQUOTE", line[j]);
 						charLeft--;
@@ -292,9 +293,10 @@ function processLine(line){
 				break;
 				
 				default:
-					tokens[tokenIndex] = "No Match for " + line[j];
+					tokens[tokenIndex] = "Error: No Match for \"" + line[j] + "\" on line " + lineNum;
 					tokenIndex++;
 					charLeft--;
+					errorCount++;
 				}
 			}
 		}
@@ -316,7 +318,7 @@ function processToken(ln, t, v){
 	//putMessage("Processed: " + v + " on line " + ln);
 }
 
-//OBJECT CONSTRUCTORS-----------------------------------------------------------------
+//OBJECT CONSTRUCTORS--------------------------------------------------------------------
 /* --------  
    Token Object Constructor
    Params: 	lineNum:int  - the line number the token is on, 1 is the first line number

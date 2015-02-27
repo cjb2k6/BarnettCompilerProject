@@ -45,7 +45,7 @@
         tokens = [];
         tokenIndex = 0;
         currentToken = ' ';
-        errorCount = 0;        
+        errorCount = 0;    
     }
     
     function btnCompile_click() {    
@@ -58,6 +58,7 @@
 		lex();
 		
 		putMessage("Lexing Finished");
+		putMessage("--------------------------");
 		putMessage("Lex Output:");
 		tokenIndex = 0;
 		//Test code to display lexer output

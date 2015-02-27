@@ -1,8 +1,11 @@
 //The main parse function
 function parse(){
 	putMessage("Begin Parse");
+	//Read in the first token
 	currentToken = getNextToken();
+	//Start the parse
 	parseProgram();
+	putMessage("--------------------------");
 	putMessage("Parsing Finished");
 	putMessage("Parsing found " + errorCount + " error(s).");
 }
@@ -153,28 +156,35 @@ function parseCharList(){
 	}
 }
 
-//Function from Alan's Example
+//Function from Alan's example, modified a bit
 function getNextToken() {
         var thisToken = EOF;    // Let's assume that we're at the EOF.
+		if(tokenIndex == tokens.length - 1){
+			if(tokens[tokenIndex].type != "T_EOF"){
+				putMessage("\nWarning: No $ detected at the end of file, one will be added automatically.\n");
+				tokens[tokens.length] = EOF;
+			}
+		}
         if (tokenIndex < tokens.length)
         {
             // If we're not at EOF, then return the next token in the stream and advance the index.
             thisToken = tokens[tokenIndex];
-            putMessage("Current token:" + thisToken.type);
+			putMessage("--------------------------");
+            putMessage("Current token:" + thisToken.type + ": " + thisToken.value);
             tokenIndex++;
         }
         return thisToken;
     }
-	
+
+//This function will check to see if the current token is the same type as the expected token type
 function matchToken(expectedType){
 	switch(expectedType){
 		case "T_EOF":
 					putMessage("Expecting EOF");
-					//if(){
 						if(currentToken.type == "T_EOF"){
 							putMessage("Got EOF!");
 						} else {
-							putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+							putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 							errorCount++;
 						}
 		break;
@@ -184,7 +194,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_LEFTBRACE"){
 						putMessage("Got a Left Brace!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -194,7 +204,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_RIGHTBRACE"){
 						putMessage("Got a Right Brace!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -204,7 +214,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_PRINT"){
 						putMessage("Got a Print Keyword!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -214,7 +224,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_ID"){
 						putMessage("Got an Identifier!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -224,7 +234,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_TYPE"){
 						putMessage("Got a Type Keyword!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -234,7 +244,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_WHILE"){
 						putMessage("Got the While Keyword!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -244,7 +254,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_IF"){
 						putMessage("Got the If Keyword!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -254,7 +264,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_LEFTPAREN"){
 						putMessage("Got a Left Paren!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -264,7 +274,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_RIGHTPAREN"){
 						putMessage("Got a RIGHT Paren!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -274,7 +284,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_INTOP"){
 						putMessage("Got an Int Operator!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -284,7 +294,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_DBLQUOTE"){
 						putMessage("Got a Double Quotation Mark!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -294,7 +304,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_BOOLVAL"){
 						putMessage("Got a Boolean!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -304,7 +314,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_BOOLOP"){
 						putMessage("Got a Boolean Operator!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -314,7 +324,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_ASSIGNOP"){
 						putMessage("Got an Assignment Operator!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -324,7 +334,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_DIGIT"){
 						putMessage("Got a Digit!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -334,7 +344,7 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_CHAR"){
 						putMessage("Got a Character!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line " + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
@@ -344,15 +354,16 @@ function matchToken(expectedType){
 					if(currentToken.type == "T_SPACE"){
 						putMessage("Got a Space!");
 					} else {
-						putMessage("Error: Got " + currentToken.type + " instead on line" + currentToken.lineNumber);
+						putMessage("\nError: Got " + currentToken.type + " instead on line" + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		default:
-					putMessage("Match Token Failed on Line " + currentToken.lineNumber);
+					putMessage("\nMatch Token Failed on Line " + currentToken.lineNumber + "\n");
 					errorCount++;
 		
 	}
+	//Read the next token
 	currentToken = getNextToken();
 }

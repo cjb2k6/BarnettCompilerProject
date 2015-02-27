@@ -1,0 +1,50 @@
+--Test Cases For Project 1--
+
+--Valid Program 1--
+{
+ a=2
+ b =3
+ c= 4
+ d = 5
+ while true {
+  string a
+  a = "string"
+  print(a)
+ }
+ if(d==5){
+  print("finished")
+ }
+}
+$
+
+--Valid Program 2--
+{intaa=2whiletrue{a=5+a}stringbb="the format here is terrible"booleancc=falseif(c!=true){print(b)}}$
+
+--Lex Error Test--
+{
+ String # = "Not-@_vaLid_$trinG.";
+ if(# == "A val!d s+rIn6"){
+  print("stri
+  ng")
+ }
+}
+$
+
+--Parse Error Test 1--
+{
+ a = g
+ string "t"
+ if(true){
+	k = 9
+ }
+}
+$
+
+--Parse Error Test 2--
+{
+ a = 1
+ while(a != 5){
+  k = $
+  a = 1 + a
+ }
+}
