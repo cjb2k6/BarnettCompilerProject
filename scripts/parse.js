@@ -23,10 +23,10 @@ function parseBlock(){
 
 function parseStatementList(){
 	var t = currentToken.type;
-	if(t == "T_PRINT" || t == "T_ID" || t == "T_TYPE" ||  t == "T_WHILE" || t == "T_IF"){
+	if(t == "T_PRINT" || t == "T_ID" || t == "T_TYPE" ||  t == "T_WHILE" || t == "T_IF" || t == "T_LEFTBRACE"){
 		parseStatement();
 		parseStatementList();
-	} else {
+	}else{
 		//Epsilon Thingy
 	}
 }
@@ -51,6 +51,10 @@ function parseStatement(){
 		
 		case "T_IF":
 			parseIfStatement();
+		break;
+		
+		case "T_LEFTBRACE":
+			parseBlock();
 		break;
 		
 		default:
@@ -98,7 +102,7 @@ function parseExpr(){
 			parseStringExpr();
 		break;
 		
-		case "T_RIGHTPAREN":
+		case "T_LEFTPAREN":
 			parseBooleanExpr();
 		break;
 		
