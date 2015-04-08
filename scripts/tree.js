@@ -17,19 +17,22 @@ function Tree(){
         if ( (this.root == null) || (!this.root) ){
             // This is the root node.
             this.root = node;
+			//putMessage("Created Root Node: " + node.name);
         }else{
 			//Assign the current node to be this node's parent.
             node.parent = this.current;
 			//Add this node to the children of its parent
+			//putMessage("Created Branch Node: " + node.name);
             this.current.children.push(node);
         }
 		//Assign this node to be the current node
-		this.current = this.node;
+		this.current = node;
     };
 	
 	//Function to add a new leaf off of the current node
-	this.addLeafNode = function(name){
-		var node = { name: name,
+	this.addLeafNode = function(token){
+		var node = {token: token,
+					name: token.value,
 					children: [],
 					parent: {}
 					};
@@ -45,8 +48,9 @@ function Tree(){
 		}
 	};
 	//Function to Return to Parent node.
-	this.rtp(){
-		this.current = current.parent;
+	this.rtp = function(){
+		//putMessage("Returning to parent: " + this.current.parent.name);
+		this.current = this.current.parent;
 	};
 	
 	//Function from jsTreeDemo to print the tree.

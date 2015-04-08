@@ -1,37 +1,54 @@
 //The main parse function
 function parse(){
+	//Create an artificial root for the CST
+	cst.addBranchNode("ROOT");
+	
 	putMessage("Begin Parse");
 	//Read in the first token
 	currentToken = getNextToken();
 	//Start the parse
 	parseProgram();
+	
+	if(tokenIndex < tokens.length){
+		putMessage("\nWARNING! There should not be any code after the EOF symbol($).\n");
+	}
 	putMessage("--------------------------");
 	putMessage("Parsing Finished");
 	putMessage("Parsing found " + errorCount + " error(s).");
 }
 
 function parseProgram(){
+	cst.addBranchNode("Program");
 	parseBlock();
 	matchToken("T_EOF");
+	cst.rtp();
 }
 
 function parseBlock(){
+	cst.addBranchNode("Block");
+	cst.addLeafNode(currentToken);
 	matchToken("T_LEFTBRACE");
 	parseStatementList();
+	cst.addLeafNode(currentToken);
 	matchToken("T_RIGHTBRACE");
+	cst.rtp();
 }
 
 function parseStatementList(){
+	cst.addBranchNode("StatementList");
 	var t = currentToken.type;
 	if(t == "T_PRINT" || t == "T_ID" || t == "T_TYPE" ||  t == "T_WHILE" || t == "T_IF" || t == "T_LEFTBRACE"){
 		parseStatement();
 		parseStatementList();
 	}else{
 		//Epsilon Thingy
+		cst.addLeafNode(epsilon);
 	}
+	cst.rtp();
 }
 
 function parseStatement(){
+	cst.addBranchNode("Statement");
 	switch(currentToken.type){
 		case "T_PRINT":
 			parsePrintStatement();
@@ -60,39 +77,60 @@ function parseStatement(){
 		default:
 			putMessage("Could not parseStatement " + currentToken.type);
 	}
+	cst.rtp();
 }
 
 function parsePrintStatement(){
+	cst.addBranchNode("PrintStatement");
+	cst.addLeafNode(currentToken);
 	matchToken("T_PRINT");
+	cst.addLeafNode(currentToken);
 	matchToken("T_LEFTPAREN");
 	parseExpr();
+	cst.addLeafNode(currentToken);
 	matchToken("T_RIGHTPAREN");
+	cst.rtp();
 }
 
 function parseAssignmentStatement(){
+	cst.addBranchNode("AssignmentStatement");
+	cst.addLeafNode(currentToken);
 	matchToken("T_ID");
+	cst.addLeafNode(currentToken);
 	matchToken("T_ASSIGNOP");
 	parseExpr();
+	cst.rtp();
 }
 
 function parseVarDecl(){
+	cst.addBranchNode("VarDecl");
+	cst.addLeafNode(currentToken);
 	matchToken("T_TYPE");
+	cst.addLeafNode(currentToken);
 	matchToken("T_ID");
+	cst.rtp();
 }
 
 function parseWhileStatement(){
+	cst.addBranchNode("WhileStatement");
+	cst.addLeafNode(currentToken);
 	matchToken("T_WHILE");
 	parseBooleanExpr();
 	parseBlock();
+	cst.rtp();
 }
 
 function parseIfStatement(){
+	cst.addBranchNode("IfStatement");
+	cst.addLeafNode(currentToken);
 	matchToken("T_IF");
 	parseBooleanExpr();
 	parseBlock();
+	cst.rtp();
 }
 
 function parseExpr(){
+	cst.addBranchNode("Expr");
 	switch(currentToken.type){
 		case "T_DIGIT":
 			parseIntExpr();
@@ -111,53 +149,74 @@ function parseExpr(){
 		break;
 		
 		case "T_ID":
+			cst.addLeafNode(currentToken);
 			matchToken("T_ID");
 		break;
 		
 		default:
 			putMessage("Could not parseExpr " + currentToken.type);
 	}
+	cst.rtp();
 }
 
 function parseIntExpr(){
+	cst.addBranchNode("IntExpr");
+	cst.addLeafNode(currentToken);
 	matchToken("T_DIGIT");
 	if(currentToken.type == "T_INTOP"){
+		cst.addLeafNode(currentToken);
 		matchToken("T_INTOP");
 		parseExpr();
 	}
+	cst.rtp();
 }
 
 function parseStringExpr(){
+	cst.addBranchNode("StringExpr");
+	cst.addLeafNode(currentToken);
 	matchToken("T_DBLQUOTE");
 	parseCharList();
+	cst.addLeafNode(currentToken);
 	matchToken("T_DBLQUOTE");
+	cst.rtp()
 }
 
 function parseBooleanExpr(){
+	cst.addBranchNode("BooleanExpr");
 	if(currentToken.type == "T_LEFTPAREN"){
+		cst.addLeafNode(currentToken);
 		matchToken("T_LEFTPAREN");
 		parseExpr();
+		cst.addLeafNode(currentToken);
 		matchToken("T_BOOLOP");
 		parseExpr();
+		cst.addLeafNode(currentToken);
 		matchToken("T_RIGHTPAREN");
 	}else{
+		cst.addLeafNode(currentToken);
 		matchToken("T_BOOLVAL");
 	}
+	cst.rtp();
 }
 
 function parseCharList(){
+	cst.addBranchNode("CharList");
 	var t = currentToken.type;
 	if(t == "T_CHAR" || t == "T_SPACE"){
 		if(t == "T_CHAR"){
+			cst.addLeafNode(currentToken);
 			matchToken("T_CHAR");
 			parseCharList();
 		}else{
+			cst.addLeafNode(currentToken);
 			matchToken("T_SPACE");
 			parseCharList();
 		}
 	} else {
 		//Epsilon Thingy
+		cst.addLeafNode(epsilon);
 	}
+	cst.rtp();
 }
 
 //Function from Alan's example, modified a bit
@@ -165,7 +224,7 @@ function getNextToken() {
         var thisToken = EOF;    // Let's assume that we're at the EOF.
 		if(tokenIndex == tokens.length - 1){
 			if(tokens[tokenIndex].type != "T_EOF"){
-				putMessage("\nWarning: No $ detected at the end of file, one will be added automatically.\n");
+				putMessage("\nWARNING! No $ detected at the end of file, one will be added automatically.\n");
 				tokens[tokens.length] = EOF;
 			}
 		}
