@@ -317,21 +317,3 @@ function processToken(ln, t, v){
 	tokenIndex++;
 	//putMessage("Processed: " + v + " on line " + ln);
 }
-
-//OBJECT CONSTRUCTORS--------------------------------------------------------------------
-/* --------  
-   Token Object Constructor
-   Params: 	lineNum:int  - the line number the token is on, 1 is the first line number
-			type:String  - the type of token it is
-			value:String - the actual token itself
-			
-   Methods: toString() - overrides default toString, prints the three values in one line.
-   -------- */
-function tokenObj(lineNumber, type, value){
-	this.lineNumber = lineNumber;
-	this.type = type;
-	this.value = value;
-	this.toString = function(){
-		return "" + this.lineNumber + " " + this.type + " \"" + this.value + "\"";
-	};
-}

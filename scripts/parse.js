@@ -122,10 +122,11 @@ function parseWhileStatement(){
 
 function parseIfStatement(){
 	cst.addBranchNode("IfStatement");
-	cst.addLeafNode(currentToken);
+	cst.addBranchNode("if");
 	matchToken("T_IF");
 	parseBooleanExpr();
 	parseBlock();
+	cst.rtp();
 	cst.rtp();
 }
 

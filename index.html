@@ -29,6 +29,7 @@
     <script type="text/javascript" src="scripts/lexer.js"></script>		
 	<script type="text/javascript" src="scripts/parse.js"></script>
 	<script type="text/javascript" src="scripts/tree.js"></script>
+	<script type="text/javascript" src="scripts/ast.js"></script>
     <script type="text/javascript">
     // Global variables
     var tokens = [];
@@ -37,6 +38,7 @@
     var errorCount = 0;
     var EOF = new tokenObj(0, "T_EOF", "$");
 	var cst;
+	var ast;
 	var epsilon = new tokenObj(0, "Epsilon", "epsilon");
 	
 	
@@ -50,6 +52,7 @@
         currentToken = ' ';
         errorCount = 0;    
 		cst = new Tree();
+		ast = new Tree();
     }
     
     function btnCompile_click() {    
@@ -77,7 +80,12 @@
 		}
 		if(errorCount == 0){
 			putMessage("--------------------------");
+			putMessage("CST");
 			putMessage(cst.toString());
+			makeAST();
+			putMessage("--------------------------");
+			putMessage("AST");
+			putMessage(ast.toString());
 		}
     }
     
@@ -85,6 +93,23 @@
         document.getElementById("taOutput").value += msg + "\n";
     }
 	
+	//OBJECT CONSTRUCTORS--------------------------------------------------------------------
+/* --------  
+   Token Object Constructor
+   Params: 	lineNum:int  - the line number the token is on, 1 is the first line number
+			type:String  - the type of token it is
+			value:String - the actual token itself
+			
+   Methods: toString() - overrides default toString, prints the three values in one line.
+   -------- */
+function tokenObj(lineNumber, type, value){
+	this.lineNumber = lineNumber;
+	this.type = type;
+	this.value = value;
+	this.toString = function(){
+		return "" + this.lineNumber + " " + this.type + " \"" + this.value + "\"";
+	};
+}
     </script>
 </body>
 </html>

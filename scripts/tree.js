@@ -8,7 +8,8 @@ function Tree(){
 	//Tree Functions------------------------------------------------------------
 	//Function to add a new branch off of the current node and go to that branch
 	this.addBranchNode = function(name){
-		var node = { name: name,
+		var node = { token:{}, 
+					name: name,
 					children: [],
 					parent: {}
 					};
@@ -47,12 +48,13 @@ function Tree(){
             this.current.children.push(node);
 		}
 	};
+	
 	//Function to Return to Parent node.
 	this.rtp = function(){
 		//putMessage("Returning to parent: " + this.current.parent.name);
 		this.current = this.current.parent;
 	};
-	
+		
 	//Function from jsTreeDemo to print the tree.
 	// Return a string representation of the tree.
     this.toString = function() {
