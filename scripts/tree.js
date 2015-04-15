@@ -30,6 +30,30 @@ function Tree(){
 		this.current = node;
     };
 	
+	//Function to add a new scope node for Symbol Table only
+	this.addScopeNode = function(level){
+		var node = { scope:new scope(level), 
+					name: "Scope " + level,
+					children: [],
+					parent: {}
+					};
+		
+		// Check to see if it needs to be the root node.
+        if ( (this.root == null) || (!this.root) ){
+            // This is the root node.
+            this.root = node;
+			//putMessage("Created Root Node: " + node.name);
+        }else{
+			//Assign the current node to be this node's parent.
+            node.parent = this.current;
+			//Add this node to the children of its parent
+			//putMessage("Created Branch Node: " + node.name);
+            this.current.children.push(node);
+        }
+		//Assign this node to be the current node
+		this.current = node;
+    };
+	
 	//Function to add a new leaf off of the current node
 	this.addLeafNode = function(token){
 		var node = {token: token,

@@ -8,7 +8,7 @@
 <body onload="init();">
     <h1>Christopher Barnett's Compiler Project</h1>
     <p>
-        . . . <em>Parse Fixed</em>:
+        . . . <em>Semantic Analysis</em>:
     </p>  
     <div>
         <textarea id="taSourceCode" cols="32" rows="18"></textarea>
@@ -30,6 +30,7 @@
 	<script type="text/javascript" src="scripts/parse.js"></script>
 	<script type="text/javascript" src="scripts/tree.js"></script>
 	<script type="text/javascript" src="scripts/ast.js"></script>
+	<script type="text/javascript" src="scripts/symbolTable.js"></script>
     <script type="text/javascript">
     // Global variables
     var tokens = [];
@@ -39,6 +40,7 @@
     var EOF = new tokenObj(0, "T_EOF", "$");
 	var cst;
 	var ast;
+	var symtab;
 	var epsilon = new tokenObj(0, "Epsilon", "epsilon");
 	
 	
@@ -53,6 +55,9 @@
         errorCount = 0;    
 		cst = new Tree();
 		ast = new Tree();
+		symtab = new Tree();
+		//TESTING
+		//testSymbolTable();
     }
     
     function btnCompile_click() {    
@@ -86,6 +91,13 @@
 			putMessage("--------------------------");
 			putMessage("AST");
 			putMessage(ast.toString());
+			symbolTable();
+		}
+		if(errorCount == 0){
+		 putMessage("--------------------------");
+			putMessage("Symbol Table");
+			putMessage(symtab.toString());
+			//Ready for code gen
 		}
     }
     
@@ -94,7 +106,7 @@
     }
 	
 	//OBJECT CONSTRUCTORS--------------------------------------------------------------------
-/* --------  
+	/* --------  
    Token Object Constructor
    Params: 	lineNum:int  - the line number the token is on, 1 is the first line number
 			type:String  - the type of token it is
