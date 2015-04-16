@@ -1,0 +1,71 @@
+Good Cases, should work
+{
+ int a
+ a = 1
+ {
+  string a
+  a = "a"
+  print(a)
+ }
+ string b
+ b = "b"
+ if(a == 1){
+  print(b)
+ }
+}$
+
+{
+ int a
+ a = 2
+ {
+  string b
+  b = "test"
+  a = 4
+ }
+ {
+  while(a == 2){
+   a = 2 + a
+  }
+ }
+ print(a)
+}$
+
+{
+ int a
+ {
+  boolean b
+  {
+   string c
+   a = 2
+   b = true
+   c = "combustable lemons"
+   string a
+   string b
+   int d
+   a = "a"
+   b = "b"
+   d = 4 + d
+  }
+  b = true
+ }
+ a = 6
+}$
+
+Bad Cases, should throw errors
+{
+ int a
+ a = "cake"
+ {
+  b = 1
+ }
+ boolean b
+ b = 6
+ while(b){
+  string c
+  b = false
+ }
+ int j
+ if(j){
+  b = 2 + b
+ }
+}$

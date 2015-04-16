@@ -119,4 +119,27 @@ function Tree(){
         return traversalResult;
     };
 	
+	this.printSymbTab = function() {
+        // Initialize the result string.
+        var traversalResult = "";
+
+        // Recursive function to handle the expansion of the nodes.
+        function expand(node, depth)
+        {
+			// There are children, so note these interior/branch nodes and ...
+			traversalResult += "\n" + node.name + " " + node.scope;
+			// .. recursively expand them.
+			for (var i = 0; i < node.children.length; i++)
+			{
+				expand(node.children[i], depth + 1);
+			}
+        }
+        // Make the initial call to expand from the root.
+		putMessage("Scope\tType\tId\tLnNum");
+		putMessage("-----------------------------");
+        expand(this.root, 0);
+        // Return the result.
+        return traversalResult;
+    };
+	
 }

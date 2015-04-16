@@ -21,7 +21,6 @@ function makeAST(){
 					if(strMode){
 						//Then this " must indicate the end of the string
 						ast.addLeafNode(new tokenObj(strLineNum, "T_StringLiteral", strBuild));
-						//putMessage("Added " + node.name + " as a leaf in the AST to " + ast.current.name);
 						strMode = false;
 						strBuild = "";
 						strLineNum = -1;
@@ -40,22 +39,18 @@ function makeAST(){
 					//Need to reassign the last leaf that was added
 					compMode = true;
 					//Save the first child of the comparison
-					var index = ast.current.children.length - 1
+					var index = ast.current.children.length - 1;
 					firstChild = ast.current.children[index].token;
-					//putMessage("The old first child was " + ast.current.children[index].token);
-					//putMessage("firstChild is now " + firstChild);
 					//Remove that first child
 					ast.current.children.splice(index,1);
 					//If it is an Equals comparison
 					if(n === "=="){
 						//Make the new comparison branch
 						ast.addBranchNode("EqualComp");
-						//putMessage("Added EqualComp as a branch in the AST");
 					//If it is a Not Equals comparison
 					}else if(n === "!="){
 						//Make the new comparison branch
 						ast.addBranchNode("NotEqualComp");
-						//putMessage("Added NotEqualComp as a branch in the AST");
 					}else{
 						//Should never happen
 						putMessage("Something went horribly wrong with the BOOLOP in the AST");
@@ -64,9 +59,7 @@ function makeAST(){
 				}else if(compMode){
 					//Add the leaf we removed to the new comparison branch
 					ast.addLeafNode(firstChild);
-					//putMessage("Reassigned " + firstChild.value + " as a leaf in the AST to " + ast.current.name);
 					ast.addLeafNode(node.token);
-					//putMessage("Added " + node.name + " as a leaf in the AST to " + ast.current.name);
 					//Reset the variables
 					compMode = false;
 					firstChild = {};
@@ -75,7 +68,6 @@ function makeAST(){
 				//Just a regular leaf node
 				}else{
 					ast.addLeafNode(node.token);
-					//putMessage("Added " + node.name + " as a leaf in the AST to " + ast.current.name);
 				}
 			}
 		}
@@ -85,7 +77,6 @@ function makeAST(){
 			var n = node.name;
 			//Is this an important branch?
 			if(n === "Block" || n === "VarDecl" || n === "AssignmentStatement" || n === "PrintStatement" || n === "while" || n === "if"){
-				//putMessage("Added " + n + " as a branch child of " + ast.current.name + " in the AST");
 				ast.addBranchNode(node.name);
 				
 				for (var i = 0; i < node.children.length; i++)
