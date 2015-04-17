@@ -69,3 +69,20 @@ Bad Cases, should throw errors
   b = 2 + b
  }
 }$
+
+Warning Cases, should throw warnings
+{
+ int a
+ int b
+ string c
+ {
+  string c
+  string d
+  boolean a
+  {
+   int z
+   string g
+   boolean a
+  }
+ }
+}$

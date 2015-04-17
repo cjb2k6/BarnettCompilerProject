@@ -221,7 +221,8 @@ function processLine(line){
 					processToken(lineNum, "T_CHAR", line[j]);
 					charLeft--;
 					}else{
-						putMessage("Error on line " + lineNum + ". " + line[j] + " is not valid in a string.");
+						//putMessage("Error on line " + lineNum + ". " + line[j] + " is not valid in a string.");
+						lexOut += "Error on line " + lineNum + ". " + line[j] + " is not valid in a string." + "\n";
 						errorCount++;
 					}
 			}else{
@@ -315,5 +316,4 @@ function splitByLine(src){
 function processToken(ln, t, v){
 	tokens[tokenIndex] = new tokenObj(ln, t, v);
 	tokenIndex++;
-	//putMessage("Processed: " + v + " on line " + ln);
 }

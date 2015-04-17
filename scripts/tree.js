@@ -127,6 +127,15 @@ function Tree(){
         function expand(node, depth)
         {
 			// There are children, so note these interior/branch nodes and ...
+			var unititString = node.scope.getUninitialized();
+			if(unititString != ""){
+				uninit += unititString;
+			}
+			
+			var unusedString = node.scope.getUnused();
+			if(unusedString != ""){
+				unused += unusedString;
+			}
 			traversalResult += "\n" + node.name + " " + node.scope;
 			// .. recursively expand them.
 			for (var i = 0; i < node.children.length; i++)

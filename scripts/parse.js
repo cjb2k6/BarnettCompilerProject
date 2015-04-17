@@ -3,18 +3,21 @@ function parse(){
 	//Create an artificial root for the CST
 	cst.addBranchNode("ROOT");
 	
-	putMessage("Begin Parse");
+	outputParse("Begin Parse");
 	//Read in the first token
 	currentToken = getNextToken();
 	//Start the parse
 	parseProgram();
 	
 	if(tokenIndex < tokens.length){
-		putMessage("\nWARNING! There should not be any code after the EOF symbol($).\n");
+		outputParse("\nWARNING! There should not be any code after the EOF symbol($).\n");
 	}
-	putMessage("--------------------------");
-	putMessage("Parsing Finished");
-	putMessage("Parsing found " + errorCount + " error(s).");
+	outputParse("--------------------------");
+	outputParse("Parsing Finished");
+	outputParse("Parsing found " + errorCount + " error(s).");
+	if(errorCount > 0){
+		output("parse"); //Show the parse output
+	}
 }
 
 function parseProgram(){
@@ -75,7 +78,7 @@ function parseStatement(){
 		break;
 		
 		default:
-			putMessage("Could not parseStatement " + currentToken.type);
+			outputParse("Could not parseStatement " + currentToken.type);
 	}
 	cst.rtp();
 }
@@ -155,7 +158,7 @@ function parseExpr(){
 		break;
 		
 		default:
-			putMessage("Could not parseExpr " + currentToken.type);
+			outputParse("Could not parseExpr " + currentToken.type);
 	}
 	cst.rtp();
 }
@@ -225,7 +228,7 @@ function getNextToken() {
         var thisToken = EOF;    // Let's assume that we're at the EOF.
 		if(tokenIndex == tokens.length - 1){
 			if(tokens[tokenIndex].type != "T_EOF"){
-				putMessage("\nWARNING! No $ detected at the end of file, one will be added automatically.\n");
+				outputParse("\nWARNING! No $ detected at the end of file, one will be added automatically.\n");
 				tokens[tokens.length] = EOF;
 			}
 		}
@@ -233,8 +236,8 @@ function getNextToken() {
         {
             // If we're not at EOF, then return the next token in the stream and advance the index.
             thisToken = tokens[tokenIndex];
-			putMessage("--------------------------");
-            putMessage("Current token:" + thisToken.type + ": " + thisToken.value);
+			outputParse("--------------------------");
+            outputParse("Current token:" + thisToken.type + ": " + thisToken.value);
             tokenIndex++;
         }
         return thisToken;
@@ -244,190 +247,193 @@ function getNextToken() {
 function matchToken(expectedType){
 	switch(expectedType){
 		case "T_EOF":
-					putMessage("Expecting EOF");
+					outputParse("Expecting EOF");
 						if(currentToken.type == "T_EOF"){
-							putMessage("Got EOF!");
+							outputParse("Got EOF!");
 						} else {
-							putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+							outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 							errorCount++;
 						}
 		break;
 		
 		case "T_LEFTBRACE":
-					putMessage("Expecting a Left Brace");
+					outputParse("Expecting a Left Brace");
 					if(currentToken.type == "T_LEFTBRACE"){
-						putMessage("Got a Left Brace!");
+						outputParse("Got a Left Brace!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_RIGHTBRACE":
-					putMessage("Expecting a Right Brace");
+					outputParse("Expecting a Right Brace");
 					if(currentToken.type == "T_RIGHTBRACE"){
-						putMessage("Got a Right Brace!");
+						outputParse("Got a Right Brace!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_PRINT":
-					putMessage("Expecting Print Keyword");
+					outputParse("Expecting Print Keyword");
 					if(currentToken.type == "T_PRINT"){
-						putMessage("Got a Print Keyword!");
+						outputParse("Got a Print Keyword!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_ID":
-					putMessage("Expecting Identifier");
+					outputParse("Expecting Identifier");
 					if(currentToken.type == "T_ID"){
-						putMessage("Got an Identifier!");
+						outputParse("Got an Identifier!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_TYPE":
-					putMessage("Expecting a Type Keyword");
+					outputParse("Expecting a Type Keyword");
 					if(currentToken.type == "T_TYPE"){
-						putMessage("Got a Type Keyword!");
+						outputParse("Got a Type Keyword!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_WHILE":
-					putMessage("Expecting While Keyword");
+					outputParse("Expecting While Keyword");
 					if(currentToken.type == "T_WHILE"){
-						putMessage("Got the While Keyword!");
+						outputParse("Got the While Keyword!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_IF":
-					putMessage("Expecting If Keyword");
+					outputParse("Expecting If Keyword");
 					if(currentToken.type == "T_IF"){
-						putMessage("Got the If Keyword!");
+						outputParse("Got the If Keyword!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_LEFTPAREN":
-					putMessage("Expecting Left Paren");
+					outputParse("Expecting Left Paren");
 					if(currentToken.type == "T_LEFTPAREN"){
-						putMessage("Got a Left Paren!");
+						outputParse("Got a Left Paren!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_RIGHTPAREN":
-					putMessage("Expecting Right Paren");
+					outputParse("Expecting Right Paren");
 					if(currentToken.type == "T_RIGHTPAREN"){
-						putMessage("Got a RIGHT Paren!");
+						outputParse("Got a RIGHT Paren!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_INTOP":
-					putMessage("Expecting an Int Operator");
+					outputParse("Expecting an Int Operator");
 					if(currentToken.type == "T_INTOP"){
-						putMessage("Got an Int Operator!");
+						outputParse("Got an Int Operator!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_DBLQUOTE":
-					putMessage("Expecting a Double Quotation Mark");
+					outputParse("Expecting a Double Quotation Mark");
 					if(currentToken.type == "T_DBLQUOTE"){
-						putMessage("Got a Double Quotation Mark!");
+						outputParse("Got a Double Quotation Mark!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_BOOLVAL":
-					putMessage("Expecting a Boolean Value");
+					outputParse("Expecting a Boolean Value");
 					if(currentToken.type == "T_BOOLVAL"){
-						putMessage("Got a Boolean!");
+						outputParse("Got a Boolean!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_BOOLOP":
-					putMessage("Expecting a Boolean Operator");
+					outputParse("Expecting a Boolean Operator");
 					if(currentToken.type == "T_BOOLOP"){
-						putMessage("Got a Boolean Operator!");
+						outputParse("Got a Boolean Operator!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_ASSIGNOP":
-					putMessage("Expecting an Assignment Operator");
+					outputParse("Expecting an Assignment Operator");
 					if(currentToken.type == "T_ASSIGNOP"){
-						putMessage("Got an Assignment Operator!");
+						outputParse("Got an Assignment Operator!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_DIGIT":
-					putMessage("Expecting a Digit");
+					outputParse("Expecting a Digit");
 					if(currentToken.type == "T_DIGIT"){
-						putMessage("Got a Digit!");
+						outputParse("Got a Digit!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_CHAR":
-					putMessage("Expecting a Character");
+					outputParse("Expecting a Character");
 					if(currentToken.type == "T_CHAR"){
-						putMessage("Got a Character!");
+						outputParse("Got a Character!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line " + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		case "T_SPACE":
-					putMessage("Expecting a Space");
+					outputParse("Expecting a Space");
 					if(currentToken.type == "T_SPACE"){
-						putMessage("Got a Space!");
+						outputParse("Got a Space!");
 					} else {
-						putMessage("\nError: Got " + currentToken.type + " instead on line" + currentToken.lineNumber + "\n");
+						outputParse("\nError: Got " + currentToken.type + " instead on line" + currentToken.lineNumber + "\n");
 						errorCount++;
 					}
 		break;
 		
 		default:
-					putMessage("\nMatch Token Failed on Line " + currentToken.lineNumber + "\n");
+					outputParse("\nMatch Token Failed on Line " + currentToken.lineNumber + "\n");
 					errorCount++;
 		
 	}
 	//Read the next token
 	currentToken = getNextToken();
+}
+function outputParse(str){
+	parseOut += str + "\n";
 }
