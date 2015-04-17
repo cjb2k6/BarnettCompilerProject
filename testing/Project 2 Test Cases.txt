@@ -60,12 +60,12 @@ Bad Cases, should throw errors
  }
  boolean b
  b = 6
- while(b){
+ while(b == true){
   string c
   b = false
  }
  int j
- if(j){
+ if(j == 2){
   b = 2 + b
  }
 }$

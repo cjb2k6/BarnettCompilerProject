@@ -71,23 +71,11 @@ function buildSymbolTable(){
 			break;
 			case "AssignmentStatement":
 					outputSA("Found AssignmentStatement");
-					var type = scopeCheck(node, 0);
-					typeCheck(node, type, node.children[1].token.type)
-					symtab.current.scope.table[node.children[0].name].initialized = true;
+					var type = scopeCheck(node, 0, true);
+					outputSA(node.children[0].name);
+					//typeCheck(node, type, node.children[1].token.type)
 					if(node.children.length > 2){
-						var i = 1;
-						while(i < node.children.length - 1){
-							if(node.children[i].token.type != "T_INTOP"){
-								typeCheck(node, type, node.children[i].token.type);
-							}
-							i++;
-						}
-						if(node.children[node.children.length - 1].token.type === "T_ID"){
-							scopeCheck(node, i);
-						}else{
-							typeCheck(node, type, node.children[i].token.type);
-						}
-						
+						expand(node.children[2], depth + 1);
 					}
 			break;
 			case "PrintStatement":
@@ -118,8 +106,23 @@ function buildSymbolTable(){
 					}
 				}
 			break;
-			default:
-				outputSA("The default case of the build symbol table switch has occurred. This should not have happened. THIS SHOULD NOT HAVE HAPPENED!!!");
+			case "+":
+					outputSA("Found +");
+					/*
+					if(node.children[0].token.type === "T_ID"){
+						var type = scopeCheck(node, 0);
+						typeCheck(node, type, "T_DIGIT")
+					}
+					*/
+					for (var i = 0; i < node.children.length; i++)
+					{
+						if(node.children[i].token.type === "T_INTOP"){
+							expand(node.children[i], depth + 1);
+						}
+					}
+					
+			break;
+			default: outputSA("Found " + node.name);
 				
 				
 		}
@@ -150,21 +153,20 @@ function closeScope(){
 function checkComparison(node){
 				var type1 = node.children[0].token.type;
 				var type2 = node.children[1].token.type;
-				outputSA(type1 + " AND " + type2);
 				//If both are IDs
 				if(type1 === "T_ID" && type2 === "T_ID"){
-					type1 = scopeCheck(node, 0);
-					type2 = scopeCheck(node, 1);
+					type1 = scopeCheck(node, 0, false);
+					type2 = scopeCheck(node, 1, false);
 					if(type1 !== type2){
 						typeCheck(node, type1, type2);
 					}
 				//If 1st is ID and 2nd is not
 				}else if(type1 === "T_ID" && type2 !== "T_ID"){
-					type1 = scopeCheck(node, 0);
+					type1 = scopeCheck(node, 0, false);
 					typeCheck(node, type1, type2);
 				//If 1st is not an ID, but 2nd is
 				}else if (type1 !== "T_ID" && type2 === "T_ID"){
-					type2 = scopeCheck(node, 1);
+					type2 = scopeCheck(node, 1, false);
 					typeCheck(node, type2, type1);
 				//If neither are IDs
 				}else{
@@ -176,7 +178,7 @@ function checkComparison(node){
 					}
 				}
 }
-function scopeCheck(node, child1){
+function scopeCheck(node, child1, isAssign){
 	var symbol = node.children[child1].name; //The symbol to check, left child of AssignmentStatement
 	var currScopeNode = symtab.current
 	var found = false;
@@ -202,6 +204,9 @@ function scopeCheck(node, child1){
 		return "";
 	}else{
 		//typeCheck(node, currScopeNode.scope.table[symbol].type, node.children[child2].token.type);
+		if(isAssign){
+			currScopeNode.scope.table[symbol].initialized = true;
+		}
 		return currScopeNode.scope.table[symbol].type;
 	}
 }
