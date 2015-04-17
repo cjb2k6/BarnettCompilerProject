@@ -73,7 +73,7 @@ function buildSymbolTable(){
 					outputSA("Found AssignmentStatement");
 					var type = scopeCheck(node, 0, true);
 					outputSA(node.children[0].name);
-					//typeCheck(node, type, node.children[1].token.type)
+					typeCheck(node, type, node.children[1].token.type)
 					if(node.children.length > 2){
 						expand(node.children[2], depth + 1);
 					}
