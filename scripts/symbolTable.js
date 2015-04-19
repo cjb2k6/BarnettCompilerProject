@@ -72,10 +72,29 @@ function buildSymbolTable(){
 			case "AssignmentStatement":
 					outputSA("Found AssignmentStatement");
 					var type = scopeCheck(node, 0, true);
-					outputSA(node.children[0].name);
-					typeCheck(node, type, node.children[1].token.type)
-					if(node.children.length > 2){
-						expand(node.children[2], depth + 1);
+					if(node.children[1].token.type === "T_ID"){
+						var type2 = scopeCheck(node, 1, false);
+						if(type === type2){
+							if(node.children.length > 2){
+								expand(node.children[2], depth + 1);
+							}
+						}else{
+							errorCount++;
+							outputSA("-------------------------");
+							outputSA("Error! Type mismatch. Variable " + node.children[0].name + " on line " + node.children[0].token.lineNumber + " is of type " + type
+							+ " and variable " + node.children[1].name + " is of type " + type2 + ".");
+							outputSA("-------------------------");
+						}
+					}else if(node.children[1].name === "EqualComp" || node.children[1].name === "NotEqualComp"){
+						typeCheck(node, type, "T_BOOLVAL");
+						if(node.children.length > 2){
+							expand(node.children[2], depth + 1);
+						}
+					}else{
+					typeCheck(node, type, node.children[1].token.type);
+						if(node.children.length > 2){
+							expand(node.children[2], depth + 1);
+						}
 					}
 			break;
 			case "PrintStatement":
