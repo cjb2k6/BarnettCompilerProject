@@ -67,11 +67,13 @@ function buildSymbolTable(){
 					var id = node.children[1].name;
 					var lineNum = node.children[0].token.lineNumber;
 					symtab.current.scope.add(new symbolObj(id, type, lineNum, currentScope));
+					outputSA("Added variable " + id + " to " + symtab.current.name);
 				}
 			break;
 			case "AssignmentStatement":
 					outputSA("Found AssignmentStatement");
 					var type = scopeCheck(node, 0, true);
+					outputSA("Type: " + type);
 					if(node.children[1].token.type === "T_ID"){
 						var type2 = scopeCheck(node, 1, false);
 						if(type === type2){
@@ -90,11 +92,13 @@ function buildSymbolTable(){
 						if(node.children.length > 2){
 							expand(node.children[2], depth + 1);
 						}
+					}else if(node.children[1].name == "+"){
+						outputSA("Checking digit.");
+						typeCheck(node, type, "T_DIGIT");
+						expand(node.children[1], depth + 1);
 					}else{
+					outputSA("Type Checking Node:" + node.name + " Type:" + type + " TokenType:" + node.children[1].name);
 					typeCheck(node, type, node.children[1].token.type);
-						if(node.children.length > 2){
-							expand(node.children[2], depth + 1);
-						}
 					}
 			break;
 			case "PrintStatement":
@@ -127,17 +131,23 @@ function buildSymbolTable(){
 			break;
 			case "+":
 					outputSA("Found +");
-					/*
-					if(node.children[0].token.type === "T_ID"){
-						var type = scopeCheck(node, 0);
-						typeCheck(node, type, "T_DIGIT")
+					if(node.children[0].token.type !== "T_DIGIT"){
+						errorCount++;
+						outputSA("-------------------------");
+						outputSA("Error! There must be a digit to the left of a + on line " + node.children[0].token.lineNumber + ".");
+						outputSA("-------------------------");
 					}
-					*/
-					for (var i = 0; i < node.children.length; i++)
-					{
-						if(node.children[i].token.type === "T_INTOP"){
-							expand(node.children[i], depth + 1);
-						}
+					outputSA("Token Name of [1] :" + node.children[1].name);
+					if(node.children[1].name === "+"){
+						expand(node.children[1], depth + 1);
+					}else if(node.children[1].token.type === "T_ID"){
+						var type = scopeCheck(node, 1, false);
+						typeCheck(node, type, "T_DIGIT");
+					}else if(node.children[1].token.type !== "T_DIGIT"){
+						errorCount++;
+						outputSA("-------------------------");
+						outputSA("Error! " + node.children[1].token.value + " is not allowed in the integer operation on line " + node.children[0].token.lineNumber + ".");
+						outputSA("-------------------------");
 					}
 					
 			break;
@@ -170,32 +180,32 @@ function closeScope(){
 	}
 }
 function checkComparison(node){
-				var type1 = node.children[0].token.type;
-				var type2 = node.children[1].token.type;
-				//If both are IDs
-				if(type1 === "T_ID" && type2 === "T_ID"){
-					type1 = scopeCheck(node, 0, false);
-					type2 = scopeCheck(node, 1, false);
-					if(type1 !== type2){
-						typeCheck(node, type1, type2);
-					}
-				//If 1st is ID and 2nd is not
-				}else if(type1 === "T_ID" && type2 !== "T_ID"){
-					type1 = scopeCheck(node, 0, false);
-					typeCheck(node, type1, type2);
-				//If 1st is not an ID, but 2nd is
-				}else if (type1 !== "T_ID" && type2 === "T_ID"){
-					type2 = scopeCheck(node, 1, false);
-					typeCheck(node, type2, type1);
-				//If neither are IDs
-				}else{
-					if(type1 !== type2){
-						errorCount++;
-						outputSA("-------------------------");
-						outputSA("Error! Type mismatch. Cannot compare " + type1 + " to " + type2 +" on line " + node.children[0].token.lineNumber + ".");
-						outputSA("-------------------------");
-					}
-				}
+	var type1 = node.children[0].token.type;
+	var type2 = node.children[1].token.type;
+	//If both are IDs
+	if(type1 === "T_ID" && type2 === "T_ID"){
+		type1 = scopeCheck(node, 0, false);
+		type2 = scopeCheck(node, 1, false);
+		if(type1 !== type2){
+			typeCheck(node, type1, type2);
+		}
+	//If 1st is ID and 2nd is not
+	}else if(type1 === "T_ID" && type2 !== "T_ID"){
+		type1 = scopeCheck(node, 0, false);
+		typeCheck(node, type1, type2);
+	//If 1st is not an ID, but 2nd is
+	}else if (type1 !== "T_ID" && type2 === "T_ID"){
+		type2 = scopeCheck(node, 1, false);
+		typeCheck(node, type2, type1);
+	//If neither are IDs
+	}else{
+		if(type1 !== type2){
+			errorCount++;
+			outputSA("-------------------------");
+			outputSA("Error! Type mismatch. Cannot compare " + type1 + " to " + type2 +" on line " + node.children[0].token.lineNumber + ".");
+			outputSA("-------------------------");
+		}
+	}
 }
 function scopeCheck(node, child1, isAssign){
 	var symbol = node.children[child1].name; //The symbol to check, left child of AssignmentStatement
@@ -206,6 +216,7 @@ function scopeCheck(node, child1, isAssign){
 	//Get the declaration
 	outputSA("Checking Variable:" + symbol + " on line " + node.children[0].token.lineNumber + ".");
 	while(!found &&  depth >= 0){
+		outputSA("Checking " + currScopeNode.name);
 		if(currScopeNode.scope.checkExists(symbol)){
 			found = true;
 			outputSA("A declaration for Variable:" + symbol + " was found in " + currScopeNode.name);

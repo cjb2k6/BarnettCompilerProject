@@ -12,6 +12,7 @@ function makeAST(){
 		if ((!node.children || node.children.length === 0) && node.name !== "while")
 		{
 			var n = node.name;
+			astOutput("Leaf node: " + n);
 			//See if the node is a skippable leaf node
 			if(n !== "{" && n !== "}" && n !== "(" && n !== "print" && n !== "=" && n !== "epsilon" && n !== "+"){
 				//If the node is a "
@@ -62,8 +63,8 @@ function makeAST(){
 		//Node is a branch
 		else
 		{
-			
 			var n = node.name;
+			astOutput("Branch node " + n);
 			//Is this an important branch?
 			if(n === "Block" || n === "VarDecl" || n === "PrintStatement" || n === "AssignmentStatement"){
 				ast.addBranchNode(node.name);
@@ -89,19 +90,26 @@ function makeAST(){
 				}
 				
 			}else if(n === "IntExpr"){
-				if(node.children[0].name === "+"){
+				astOutput("Found IntExpr");
+				if(node.children.length > 1){
+					if(node.children[1].name === "+"){
 					ast.addBranchNode("+");
-					for (var i = 0; i < node.children.length; i++)
-				{
-					expand(node.children[i], depth + 1);
-				}
-				//Return to the parent of the current AST node
-				ast.rtp();
-				}else{
+					astOutput("Added + node");
 					expand(node.children[0], depth + 1);
-					//ast.rtp();
+					astOutput("Added " + node.children[0].name);
+					for (var i = 2; i < node.children.length; i++)
+					{
+						astOut += "Expanding " + node.children[i].name + "\n";
+						expand(node.children[i], depth + 1);
+					}
+					//Return to the parent of the current AST node
+					ast.rtp();
 				}
-				
+				}else{
+					astOutput("test");
+					astOutput("Expand2ing " + node.children[0].name);
+					expand(node.children[0], depth + 1);
+				}
 			}else if(n == "if" || n == "while"){ 
 				ast.addBranchNode(node.name);
 				
@@ -121,3 +129,6 @@ function makeAST(){
 	ast.addBranchNode("ROOT");
 	expand(cst.root, 0);
 };
+function astOutput(str){
+	astOut += str + "\n";
+}
