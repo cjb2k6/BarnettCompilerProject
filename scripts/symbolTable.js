@@ -68,14 +68,17 @@ function buildSymbolTable(){
 					var lineNum = node.children[0].token.lineNumber;
 					symtab.current.scope.add(new symbolObj(id, type, lineNum, currentScope));
 					outputSA("Added variable " + id + " to " + symtab.current.name);
+					node.children[1].scope = currentScope;
 				}
 			break;
 			case "AssignmentStatement":
 					outputSA("Found AssignmentStatement");
 					var type = scopeCheck(node, 0, true);
+					node.children[0].type = type;
 					outputSA("Type: " + type);
 					if(node.children[1].token.type === "T_ID"){
 						var type2 = scopeCheck(node, 1, false);
+						node.children[1].type = type2;
 						if(type === type2){
 							if(node.children.length > 2){
 								expand(node.children[2], depth + 1);
@@ -113,6 +116,8 @@ function buildSymbolTable(){
 					while(!found &&  depth >= 0){
 						if(currScopeNode.scope.checkExists(symbol)){
 							found = true;
+							node.children[0].type = currScopeNode.scope.table[symbol].type;
+							node.children[0].scope = currScopeNode.scope.level;
 						}else{
 							depth--;
 							currScopeNode = currScopeNode.parent;
@@ -219,6 +224,7 @@ function scopeCheck(node, child1, isAssign){
 		outputSA("Checking " + currScopeNode.name);
 		if(currScopeNode.scope.checkExists(symbol)){
 			found = true;
+			node.children[child1].scope = currScopeNode.scope.level;
 			outputSA("A declaration for Variable:" + symbol + " was found in " + currScopeNode.name);
 		}else{
 			depth--;
@@ -344,7 +350,7 @@ function scope(level){
 
 /* --------  
 Symbol Object Constructor
-Params: 	name:string  - the name of the symbol which is the symbol itself
+Params: name:string  - the name of the symbol which is the symbol itself
 		type:String  - the type of symbol it is
 		scopeLevel:int - the number of the scope that this symbol belongs to
 		

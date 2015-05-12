@@ -59,7 +59,9 @@ function Tree(){
 		var node = {token: token,
 					name: token.value,
 					children: [],
-					parent: {}
+					parent: {},
+					scope: -1,
+					type: "badType"
 					};
 		
 		// Check to see if this is the root node, this should not happen.
