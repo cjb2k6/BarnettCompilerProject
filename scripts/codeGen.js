@@ -6,6 +6,7 @@ var tempJumpCount;
 var addressOffset;
 var varTable;
 var jumpTable;
+var noCodeGenForYou;
 
 function codeGeneration(){
 	//initialize variables
@@ -15,19 +16,19 @@ function codeGeneration(){
 	tempVarCount = 0;
 	tempJumpCount = 0;
 	addressOffset = 0;
+	noCodeGenForYou = "";
 	varTable = new tempVarTable();
 	jumpTable = {};
 	buildCode();
-	outputCG(code);
-	outputCG("--------------------------");
-	outputCG(varTable);
-	//outputCG(jumpTable["J0"]);
-	outputCG("--------------------------");
+	//outputCG(code);
 	allocateVars();
-	outputCG(varTable);
-	outputCG("--------------------------");
 	backpatch();
-	outputCG(printCode());
+	
+	if(noCodeGenForYou !== ""){
+		outputCG(noCodeGenForYou);
+	}else{
+		outputCG(printCode());	
+	}
 }
 
 function buildCode(){
@@ -49,14 +50,17 @@ function buildCode(){
 			break;
 			case "if":
 				var tempJumpName = "J" + tempJumpCount;
+				//Expand the comparison
 				expand(node.children[0], depth + 1);
+				
 				var oldHeadPointer = headPointer - 1;
+				//Expand the block
 				for (var i = 1; i < node.children.length; i++)
 				{
 					expand(node.children[i], depth + 1);
 				}
-				//outputCG("hp:" + headPointer + " ohp:" + oldHeadPointer);
-				jumpTable[tempJumpName] = headPointer - oldHeadPointer;
+				var jumpDist = (headPointer - oldHeadPointer) - 1;
+				jumpTable[tempJumpName] = jumpDist;
 			break;
 			case "while":
 				
@@ -66,10 +70,23 @@ function buildCode(){
 					loadXFromMem(varTable.table[node.children[1].name + "@" + node.children[1].scope].name);
 				}else if(node.children[1].token.type === "T_DIGIT"){
 					loadXConst("0" + node.children[1].name);
+				}else if(node.children[1].token.type === "T_StringLiteral"){
+					noCodeGenForYou += "Sorry. Comparison of String Literals is not yet supported.\n";
 				}
 				
 				if(node.children[0].token.type === "T_ID"){
 					compareToX(varTable.table[node.children[0].name + "@" + node.children[0].scope].name);
+				}else if(node.children[0].token.type === "T_DIGIT"){
+					loadAccConst("0" + node.children[0].token.value);
+					//Load the constant into a new variable
+					var variable = "Const" + tempVarCount;
+					varTable.add(variable, -1);
+					storeAccInMem("T" + tempVarCount);
+					tempVarCount++;
+					variable += "@-1";
+					compareToX(varTable.table[variable].name);
+				}else if(node.children[0].token.type === "T_StringLiteral"){
+					noCodeGenForYou += "Sorry. Comparison of String Literals is not yet supported.";
 				}
 				
 				bne();
@@ -114,7 +131,6 @@ function buildCode(){
 			break;
 			case "PrintStatement":
 				if(node.children[0].token.type === "T_ID"){
-					outputCG(node.children[0].name + "@" + node.children[0].scope);
 					loadYFromMem(varTable.table[node.children[0].name + "@" + node.children[0].scope].name);
 					if(node.children[0].type == "int"){
 						loadXConst("01");

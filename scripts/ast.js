@@ -117,6 +117,7 @@ function makeAST(){
 				{
 					expand(node.children[i], depth + 1);
 				}
+				ast.rtp();
 			}else{
 				for (var i = 0; i < node.children.length; i++)
 				{
