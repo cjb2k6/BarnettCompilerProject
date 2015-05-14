@@ -13,7 +13,7 @@ var noCodeGenForYou;
 //FUNCTIONS------------------------------------------------------------------------------
 //The main code generation function
 function codeGeneration(){
-	//initialize variables
+	//Initialize variables
 	code = [];
 	headPointer = 0;
 	tailPointer = 255;
@@ -24,11 +24,13 @@ function codeGeneration(){
 	noCodeGenForYou = "";
 	varTable = new tempVarTable();
 	jumpTable = {};
+	
+	//Start doin' stuff
 	buildCode();
-	//outputCG(code);
 	allocateVars();
 	backpatch();
 	
+	//If there were errors, don't print the code
 	if(noCodeGenForYou !== ""){
 		outputCG(noCodeGenForYou);
 	}else{
@@ -57,7 +59,6 @@ function buildCode(){
 				var tempJumpName = "J" + tempJumpCount;
 				//Expand the comparison
 				expand(node.children[0], depth + 1);
-				
 				var oldHeadPointer = headPointer - 1;
 				//Expand the block
 				for (var i = 1; i < node.children.length; i++)
@@ -68,18 +69,19 @@ function buildCode(){
 				jumpTable[tempJumpName] = jumpDist;
 			break;
 			case "while":
+				var oldHeadPointer = headPointer;
 				var tempJumpName = "J" + tempJumpCount;
 				//Expand the comparison
 				expand(node.children[0], depth + 1);
 				
-				var oldHeadPointer = headPointer - 1;
+				var jumpDist = (255 - (headPointer + oldHeadPointer));
+				jumpTable[tempJumpName] = jumpDist;
+				
 				//Expand the block
 				for (var i = 1; i < node.children.length; i++)
 				{
 					expand(node.children[i], depth + 1);
 				}
-				var jumpDist = (255 - headPointer);
-				jumpTable[tempJumpName] = jumpDist;
 			break;
 			case "EqualComp":
 				//Conditions for the second child--------------------
@@ -88,7 +90,7 @@ function buildCode(){
 				}else if(node.children[1].token.type === "T_DIGIT"){
 					loadXConst("0" + node.children[1].name);
 				}else if(node.children[1].token.type === "T_StringLiteral"){
-					noCodeGenForYou += "Sorry, the comparison of String Literals is not yet supported.";
+					noCodeGenForYou += "Sorry, the comparison of String Literals is not yet supported.\n";
 				}else if(node.children[1].token.type === "T_BOOLVAL"){
 					if(node.children[1].name === "true"){
 						loadXConst("01");
@@ -110,7 +112,7 @@ function buildCode(){
 					variable += "@-1";
 					compareToX(varTable.table[variable].name);
 				}else if(node.children[0].token.type === "T_StringLiteral"){
-					noCodeGenForYou += "Sorry, the comparison of String Literals is not yet supported.";
+					noCodeGenForYou += "Sorry, the comparison of String Literals is not yet supported.\n";
 				}else if(node.children[0].token.type === "T_BOOLVAL"){
 					if(node.children[0].name === "true"){
 						loadAccConst("01");
@@ -127,7 +129,7 @@ function buildCode(){
 				bne();
 			break;
 			case "NotEqualComp":
-				noCodeGenForYou += "Sorry, the Not Equals (!=) comparison has not been implemented yet.";
+				noCodeGenForYou += "Sorry, the Not Equals (!=) comparison is not yet supported.\n";
 			break;
 			case "VarDecl":
 				if(node.children[0].name === "int"){
@@ -245,6 +247,7 @@ function buildCode(){
 	// Make the initial call to expand from the root.
 	expand(ast.root, 0);
 	addCode("00"); //End of code, break
+	//Are you sick of me abusing this recursive tree traversal yet?
 }
 //Function to calculate the addresses for all the variables
 function allocateVars(){
@@ -295,7 +298,11 @@ function addStringToHeap(node, str){
 	code[tailPointer] = "00";
 	tailPointer -= str.length;
 	for(i = 0; i < str.length; i++){
-		code[tailPointer + i] = str.charCodeAt(i).toString(16).toUpperCase();
+		if(typeof code[tailPointer + i] === "undefined"){
+			code[tailPointer + i] = str.charCodeAt(i).toString(16).toUpperCase();
+		}else{
+			noCodeGenForYou = "Error: Out of Memory. You got heap strings in my main code!\n";
+		}
 	}
 }
 
@@ -332,7 +339,7 @@ function addCode(str){
 		code[headPointer] = str;
 		headPointer++;
 	}else{
-		noCodeGenForYou += "Error: Out Of Memory\n";
+		noCodeGenForYou = "Error: Out Of Memory. Too much code!\n";
 	}
 }
 function addWithCarry(temp){
