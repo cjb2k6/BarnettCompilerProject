@@ -91,10 +91,8 @@ function buildCode(){
 					noCodeGenForYou += "Sorry, the comparison of String Literals is not yet supported.";
 				}else if(node.children[1].token.type === "T_BOOLVAL"){
 					if(node.children[1].name === "true"){
-						outputCG("Loaded true into X");
 						loadXConst("01");
 					}else{
-						outputCG("Loaded false into X");
 						loadXConst("00");
 					}
 				}
@@ -115,10 +113,8 @@ function buildCode(){
 					noCodeGenForYou += "Sorry, the comparison of String Literals is not yet supported.";
 				}else if(node.children[0].token.type === "T_BOOLVAL"){
 					if(node.children[0].name === "true"){
-						outputCG("Loaded true into acc");
 						loadAccConst("01");
 					}else{
-						outputCG("Loaded false into acc");
 						loadAccConst("00");
 					}
 					var variable = "Const" + tempVarCount;
@@ -131,7 +127,7 @@ function buildCode(){
 				bne();
 			break;
 			case "NotEqualComp":
-				
+				noCodeGenForYou += "Sorry, the Not Equals (!=) comparison has not been implemented yet.";
 			break;
 			case "VarDecl":
 				if(node.children[0].name === "int"){
@@ -243,7 +239,7 @@ function buildCode(){
 						addWithCarry(varTable.table[node.children[1].name + "@" + node.children[1].scope].name);
 					}
 			break;
-			default: outputSA("Found " + node.name);	
+			default: outputCG("Found " + node.name);	
 		}
 	}
 	// Make the initial call to expand from the root.
@@ -296,7 +292,6 @@ function addConstant(node, child){
 }
 
 function addStringToHeap(node, str){
-	//Add string to heap
 	code[tailPointer] = "00";
 	tailPointer -= str.length;
 	for(i = 0; i < str.length; i++){
