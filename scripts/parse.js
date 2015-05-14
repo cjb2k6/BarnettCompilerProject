@@ -116,10 +116,11 @@ function parseVarDecl(){
 
 function parseWhileStatement(){
 	cst.addBranchNode("WhileStatement");
-	cst.addLeafNode(currentToken);
+	cst.addBranchNode("while");
 	matchToken("T_WHILE");
 	parseBooleanExpr();
 	parseBlock();
+	cst.rtp();
 	cst.rtp();
 }
 

@@ -112,7 +112,6 @@ function makeAST(){
 				}
 			}else if(n == "if" || n == "while"){ 
 				ast.addBranchNode(node.name);
-				
 				for (var i = 0; i < node.children.length; i++)
 				{
 					expand(node.children[i], depth + 1);
